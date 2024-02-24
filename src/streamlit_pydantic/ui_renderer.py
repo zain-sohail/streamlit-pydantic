@@ -10,11 +10,11 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 import pandas as pd
 import streamlit as st
-from pydantic import BaseModel, ValidationError, parse_obj_as
-from pydantic.color import Color
+from pydantic import BaseModel, ValidationError, TypeAdapter
 from pydantic.json import pydantic_encoder
 
 from streamlit_pydantic import schema_utils
+from pydantic_extra_types.color import Color
 
 _OVERWRITE_STREAMLIT_KWARGS_PREFIX = "st_kwargs_"
 
@@ -102,20 +102,17 @@ class InputUI:
             import pydantic
 
             if isinstance(model, type):
-                self._input_class = pydantic.dataclasses.dataclass(model).__pydantic_model__  # type: ignore
+                self._input_class = TypeAdapter(pydantic.dataclasses.dataclass(model))  # type: ignore
             else:
-                # When model is a dataclass instance, do a full conversion to a BaseModel instance
-                self._input_class = pydantic.dataclasses.dataclass(
-                    model.__class__  # type: ignore
-                ).__pydantic_model__(**model.__dict__)
+                self._input_class = TypeAdapter(pydantic.dataclasses.dataclass(model.__class__)).validate_python(model.__dict__)
 
         else:
             self._input_class = model
 
-        self._schema_properties = self._input_class.schema(by_alias=True).get(
+        self._schema_properties = self._input_class.model_json_schema(by_alias=True).get(
             "properties", {}
         )
-        self._schema_references = self._input_class.schema(by_alias=True).get(
+        self._schema_references = self._input_class.model_json_schema(by_alias=True).get(
             "$defs", {}
         )
 
@@ -1352,9 +1349,9 @@ def pydantic_form(
             try:
                 # check if the model is an instance before parsing
                 if isinstance(model, BaseModel):
-                    return parse_obj_as(model.__class__, input_state)
+                    return TypeAdapter(model.__class__).validate_python(input_state)
                 else:
-                    return parse_obj_as(model, input_state)
+                    return TypeAdapter(model).validate_python(input_state)
             except ValidationError as ex:
                 error_text = "**Whoops! There were some problems with your input:**"
                 for error in ex.errors():

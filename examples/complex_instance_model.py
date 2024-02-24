@@ -4,9 +4,9 @@ from typing import Dict, List, Literal, Optional, Set
 
 import streamlit as st
 from pydantic import BaseModel, Field
-from pydantic.color import Color
 
 import streamlit_pydantic as sp
+from pydantic_extra_types.color import Color
 
 
 class OtherData(BaseModel):
@@ -62,7 +62,6 @@ class ExampleModel(BaseModel):
     int_dict: Dict[str, int] = Field(
         ...,
         description="Dict property with int values",
-        gt=-4,
     )
     date_dict: Dict[str, datetime.datetime] = Field(
         ...,
@@ -79,18 +78,17 @@ class ExampleModel(BaseModel):
     int_list: List[int] = Field(
         ...,
         description="List of int values",
-        max_items=4,
-        min_items=2,
-        gt=2,
+        max_length=4,
+        min_length=2,
     )
     color_list: List[Color] = Field(
         ...,
         description="List of color values",
-        min_items=2,
+        min_length=2,
     )
     object_list: List[OtherData] = Field(
         ...,
-        max_items=5,
+        max_length=5,
         description="A list of objects embedded into this model.",
     )
     object_dict: Dict[str, OtherData] = Field(

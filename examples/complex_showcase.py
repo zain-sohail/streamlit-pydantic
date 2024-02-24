@@ -6,7 +6,6 @@ import streamlit as st
 from pydantic import BaseModel, Field, SecretStr
 
 import streamlit_pydantic as sp
-from streamlit_pydantic.types import FileContent
 
 
 class SelectionValue(str, Enum):
@@ -53,14 +52,6 @@ class ShowcaseModel(BaseModel):
         description="This is a ready only text.",
         readOnly=True,
     )
-    file_list: Optional[List[FileContent]] = Field(
-        None,
-        description="A list of files. Optional property.",
-    )
-    single_file: Optional[FileContent] = Field(
-        None,
-        description="A single file. Optional property.",
-    )
     single_selection: SelectionValue = Field(
         ..., description="Only select a single item from a set."
     )
@@ -78,7 +69,7 @@ class ShowcaseModel(BaseModel):
         description="Another object embedded into this model.",
     )
     string_list: List[str] = Field(
-        ..., max_items=20, description="List of string values"
+        ..., max_length=20, description="List of string values"
     )
     int_list: List[int] = Field(..., description="List of int values")
     string_dict: Dict[str, str] = Field(

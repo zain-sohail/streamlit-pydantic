@@ -4,10 +4,10 @@ from typing import Dict, List, Literal, Optional, Set
 
 import streamlit as st
 from pydantic import BaseModel, Field, SecretStr
-from pydantic.color import Color
 
 import streamlit_pydantic as sp
 from streamlit_pydantic.types import FileContent
+from pydantic_extra_types.color import Color
 
 
 class SelectionValue(str, Enum):
@@ -104,7 +104,7 @@ class DisabledModel(BaseModel):
         description="Another object embedded into this model.",
     )
     string_list: List[str] = Field(
-        ..., max_items=20, readOnly=True, description="List of string values"
+        ..., max_length=20, readOnly=True, description="List of string values"
     )
     int_list: List[int] = Field(..., readOnly=True, description="List of int values")
     string_dict: Dict[str, str] = Field(
