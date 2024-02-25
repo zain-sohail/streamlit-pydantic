@@ -156,8 +156,9 @@ class InputUI:
             if not property.get("title"):
                 # Set property key as fallback title
                 property["title"] = _name_to_title(property_key)
-            # breakpoint()
-            schema_utils.adjust_optional_property(property)
+
+            # schema_utils.adjust_optional_property(property)
+            
             # if there are instance values, add them to the property dict
             if instance_dict is not None:
                 instance_value = instance_dict.get(property_key)

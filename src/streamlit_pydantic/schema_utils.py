@@ -179,10 +179,14 @@ def adjust_optional_property(property: Dict) -> Dict:
     # Check if the property allows null values and if anyOf is present
     if 'anyOf' in property:
         for item in property['anyOf']:
+            if '$ref' in item:
+                property['$ref'] = item['$ref']
+                del property['anyOf']
+                break
             if 'type' in item and item['type'] != 'null':
                 type_ = item.get('type')
             if 'type' in item and item['type'] == 'null':
                 # Exchange anyOf with the non-null type
                 property['type'] = type_
                 del property['anyOf']
-                # property['optional_field'] = True
+                property['optional_field'] = True
