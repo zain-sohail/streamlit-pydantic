@@ -16,7 +16,7 @@ class ExampleModel(BaseModel):
 
 
 data = sp.pydantic_form(
-    key="my_form", model=ExampleModel, group_optional_fields="expander"
+    key="my_form", model=ExampleModel, group_optional_fields="no"
 )
 if data:
-    st.json(data.json())
+    st.json(data.model_json_schema())

@@ -171,3 +171,18 @@ def is_object_list_property(property: Dict, references: Dict) -> bool:
         return "properties" in object_reference
     except Exception:
         return False
+
+def adjust_optional_property(property: Dict) -> Dict:
+    """
+    Adjusts optional property to unify type if null is allowed.
+    """
+    # Check if the property allows null values and if anyOf is present
+    if 'anyOf' in property:
+        for item in property['anyOf']:
+            if 'type' in item and item['type'] != 'null':
+                type_ = item.get('type')
+            if 'type' in item and item['type'] == 'null':
+                # Exchange anyOf with the non-null type
+                property['type'] = type_
+                del property['anyOf']
+                # property['optional_field'] = True

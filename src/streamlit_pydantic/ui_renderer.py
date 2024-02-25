@@ -124,10 +124,10 @@ class InputUI:
             # The rendering also returns the current state of input data
             self._session_state[self._session_input_key] = self._input_class.render_input_ui(  # type: ignore
                 self._streamlit_container, self._session_state[self._session_input_key]
-            ).dict()
+            ).model_dump()
             return self._session_state[self._session_input_key]
 
-        required_properties = self._input_class.schema(by_alias=True).get(
+        required_properties = self._input_class.model_json_schema(by_alias=True).get(
             "required", []
         )
 
@@ -135,8 +135,8 @@ class InputUI:
 
         # check if the input_class is an instance and build value dicts
         if isinstance(self._input_class, BaseModel):
-            instance_dict = self._input_class.dict()
-            instance_dict_by_alias = self._input_class.dict(by_alias=True)
+            instance_dict = self._input_class.model_dump()
+            instance_dict_by_alias = self._input_class.model_dump(by_alias=True)
         else:
             instance_dict = None
             instance_dict_by_alias = None
@@ -156,7 +156,8 @@ class InputUI:
             if not property.get("title"):
                 # Set property key as fallback title
                 property["title"] = _name_to_title(property_key)
-
+            # breakpoint()
+            schema_utils.adjust_optional_property(property)
             # if there are instance values, add them to the property dict
             if instance_dict is not None:
                 instance_value = instance_dict.get(property_key)
@@ -222,6 +223,9 @@ class InputUI:
             # Read only property -> only show value
             disabled = True
 
+        # if property.get("optional_field"):
+        #     streamlit_kwargs["placeholder"] = "Optional field"
+            
         streamlit_kwargs = {
             "label": label,
             "key": str(self._session_state.run_id) + "-" + str(self._key) + "-" + key,
@@ -1023,6 +1027,8 @@ class InputUI:
         return object_list
 
     def _render_property(self, streamlit_app: Any, key: str, property: Dict) -> Any:
+        # adjusts the property to allow it to display
+
         if schema_utils.is_single_enum_property(property, self._schema_references):
             return self._render_single_enum_input(streamlit_app, key, property)
 
@@ -1177,7 +1183,7 @@ class OutputUI:
             #    "Failed to execute custom render_output_ui function. Using auto-generation instead"
             # )
 
-        model_schema = output_data.schema(by_alias=False)
+        model_schema = output_data.model_json_schema(by_alias=False)
         model_properties = model_schema.get("properties")
         definitions = model_schema.get("$defs")
 
@@ -1257,7 +1263,7 @@ class OutputUI:
                     # Render using the render function
                     data_item.render_output_ui(streamlit)  # type: ignore
                     continue
-                data_items.append(data_item.dict())
+                data_items.append(data_item.model_dump())
             # Try to show as dataframe
             streamlit.table(pd.DataFrame(data_items))
         except Exception:

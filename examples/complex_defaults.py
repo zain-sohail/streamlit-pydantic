@@ -33,11 +33,9 @@ class ExampleModel(BaseModel):
         multiple_of=2,
         description="Number property with a limited range",
     )
-    single_selection: SelectionValue = Field(
-        "bar", description="Only select a single item from a set."
+    single_selection: SelectionValue = Field(description="Only select a single item from a set."
     )
-    multi_selection: Set[SelectionValue] = Field(
-        "bar", description="Allows multiple items from a set."
+    multi_selection: Set[SelectionValue] = Field(description="Allows multiple items from a set."
     )
     read_only_text: str = Field(
         "Lorem ipsum dolor sit amet",
