@@ -12,6 +12,7 @@ def resolve_reference(reference: str, references: Dict) -> Dict:
 
 def get_single_reference_item(property: Dict, references: Dict) -> Dict:
     # Ref can either be directly in the properties or the first element of allOf
+    adjust_optional_property(property)
     reference = property.get("$ref")
     if reference is None:
         reference = property["allOf"][0]["$ref"]
